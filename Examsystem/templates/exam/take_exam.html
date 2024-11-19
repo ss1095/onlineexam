@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Take Exam: {{ exam.title }}</title>
+    <script>
+        function startTimer(duration) {
+            var timer = duration, minutes, seconds;
+            var countdown = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                document.getElementById("time").textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(countdown);
+                    document.getElementById("examForm").submit();
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            var duration = {{ exam.duration*60}}; // Convert minutes to seconds
+            startTimer(duration);
+        };
+    </script>
+</head>
+<body>
+    <h2>{{ exam.title }}</h2>
+    <p>Time Remaining: <span id="time"></span></p>
+    <form id="examForm" method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+            <div>
+                <h3>{{ question.question_text }}</h3>
+                <label><input type="radio" name="question_{{ question.id }}" value="A"> {{ question.answer_a }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="B"> {{ question.answer_b }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="C"> {{ question.answer_c }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="D"> {{ question.answer_d }}</label><br>
+            </div>
+        {% endfor %}
+        <button type="submit">Submit Exam</button>
+    </form>
+</body>
+</html>
